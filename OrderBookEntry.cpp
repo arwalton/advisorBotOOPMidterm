@@ -23,6 +23,7 @@ OrderBookEntry::~OrderBookEntry()
 
 //TODO test current version vs branchless version
 OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
+    /*
     if(s == "ask"){
         return OrderBookType::ask;
     }
@@ -30,11 +31,11 @@ OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
         return OrderBookType::bid;
     }
     return OrderBookType::unknown;
-
-    /*
-    My attempt at a branchless version
-    return (OrderBookType)((s == "ask") + 2*(s == "bid"));
     */
+    
+    //My attempt at a branchless version
+    return (OrderBookType)((s == "ask") + 2*(s == "bid"));
+    
 }
 
 std::string OrderBookEntry::obtToString(){
