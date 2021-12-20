@@ -32,6 +32,8 @@ class AdvisorBot
 	private:
 		//Tells the function to continue the while loop until instructed not to.
 		bool running = true;
+		//Stores the current time step of the simulation
+		std::string currentTime;
 
 		//Stores the command key words available to the user.
 		const std::vector<std::string> commands{
@@ -75,6 +77,10 @@ class AdvisorBot
 		 */
 		void printCommands(std::vector<std::string>& input);
 
-
+		/**
+		 * @brief Prints the current time in the simulation
+		 * 
+		 */
+		void printCurrentTime();
 };
 #endif

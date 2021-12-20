@@ -66,7 +66,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[5]){ //predict
         std::cout << "Still need to implement predict" << std::endl;
     }else if(command == commands[6]){ //time
-        std::cout << "Still need to implement time"  << std::endl;
+        printCurrentTime();
     }else if(command == commands[7]){ //step
         std::cout << "Still need to implement step"  << std::endl;
     }else if(command == commands[8]){ //owncommand
@@ -82,6 +82,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
 
 //**********Execute user commands************
 
+//Called on help
 void AdvisorBot::printCommands(){
     std::cout << "Here are the available commands:" << std::endl;
     for(auto& command : commands){
@@ -90,9 +91,11 @@ void AdvisorBot::printCommands(){
     std::cout << "Type help followed by the name of a command for more information on specific commands. For example: help avg" << std::endl;
 }
 
+//Called on help cmd
 void AdvisorBot::printCommands(std::vector<std::string>& input){
     if(input.size() != 2){
         std::cout << "The help command can only be alone or followed by a single command." << std::endl;
+        return;
     }
     std::string command = input[1];
 
@@ -126,3 +129,28 @@ void AdvisorBot::printCommands(std::vector<std::string>& input){
     }  
 }
 
+//Called on prod
+//TODO implement this
+
+//Called on min
+//TODO implement this
+
+//Called on max
+//TODO implement this
+
+//Called on avg
+//TODO implement this
+
+//Called on predict
+//TODO implement this
+
+//Called on time
+void AdvisorBot::printCurrentTime(){
+    std::cout << "TODO Implement this function, after implementing OrderBookEntry and OrderBook classes" << std::endl;
+}
+
+//Called on step
+//TODO implement this
+
+//Called on owncommand
+//TODO implement this
