@@ -62,7 +62,16 @@ class OrderBookEntry
 		 * 
 		 * @return std::string 
 		 */
-		std::string obtToString();
+		static std::string obtToString(OrderBookType obt);
+
+		/**
+		 * @brief Overloads the << operator so that it can be used directly on an OrderBookType
+		 * 
+		 * @param os 
+		 * @param obt 
+		 * @return std::ostream& 
+		 */
+		friend std::ostream& operator<<(std::ostream& os, OrderBookType& obt);
 
 
 };

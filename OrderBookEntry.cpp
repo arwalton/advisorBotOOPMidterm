@@ -21,25 +21,14 @@ OrderBookEntry::~OrderBookEntry()
 	
 }
 
-//TODO test current version vs branchless version
 OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
-    /*
-    if(s == "ask"){
-        return OrderBookType::ask;
-    }
-    if(s == "bid"){
-        return OrderBookType::bid;
-    }
-    return OrderBookType::unknown;
-    */
-    
-    //My attempt at a branchless version
-    return (OrderBookType)((s == "ask") + 2*(s == "bid"));
+    //Replaced original code with branchless version to optimize for speed
+    return (OrderBookType)((s == "bid") + 2*(s == "ask"));
     
 }
 
-std::string OrderBookEntry::obtToString(){
-    switch(orderType){
+std::string OrderBookEntry::obtToString(OrderBookType obt){
+    switch(obt){
         case OrderBookType::ask:
             return "ask";
             break;
@@ -63,8 +52,13 @@ std::string OrderBookEntry::toString(){
     entry = entry + "amount: " + std::to_string(amount) + "\n";
     entry = entry + "timestamp: " + timestamp + "\n";
     entry = entry + "product: " + product + "\n";
-    entry = entry + "ordertype: " + obtToString() + "\n";
+    entry = entry + "ordertype: " + obtToString(orderType) + "\n";
     
     return entry;
+}
+
+std::ostream& operator<<(std::ostream& os, OrderBookType& obt){
+    os << OrderBookEntry::obtToString(obt);
+    return os;
 }
 

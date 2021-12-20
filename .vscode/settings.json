@@ -45,6 +45,22 @@
         "vector": "cpp",
         "sstream": "cpp",
         "string": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "algorithm": "cpp",
+        "array": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "iomanip": "cpp",
+        "locale": "cpp",
+        "map": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "xlocbuf": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp",
+        "xtree": "cpp"
     }
 }

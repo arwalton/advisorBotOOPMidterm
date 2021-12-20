@@ -38,7 +38,8 @@ class AdvisorBot
 		std::string currentTime;
 
 		//Stores the OrderBook for the simulation
-		OrderBook orderBook{"small-test.csv"};
+		OrderBook orderBook{"20200601.csv"};
+
 
 		//Stores the command key words available to the user.
 		const std::vector<std::string> commands{
@@ -87,5 +88,23 @@ class AdvisorBot
 		 * 
 		 */
 		void printCurrentTime();
+
+		/**
+		 * @brief Advances current time to the next timeframe in the data
+		 * 
+		 */
+		void advanceTime();
+
+		/**
+		 * @brief Prints a list of the available products in the simulation
+		 * 
+		 */
+		void printProducts();
+
+		/**
+		 * @brief Prints the mi
+		 * 
+		 */
+		void printMin(std::vector<std::string>& input);
 };
 #endif

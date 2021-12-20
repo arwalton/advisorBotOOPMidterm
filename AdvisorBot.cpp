@@ -1,7 +1,9 @@
 #include "AdvisorBot.h"
+#include "OrderBookEntry.h"
 #include <iostream>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 	
 AdvisorBot::AdvisorBot()
@@ -16,6 +18,7 @@ AdvisorBot::~AdvisorBot()
 
 void AdvisorBot::init(){
     std::vector<std::string> input;
+    currentTime = orderBook.getEarliestTime();
     
     while(running){
         input = getUserOption();
@@ -56,9 +59,9 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
             printCommands();
         }
     }else if(command == commands[1]){ //prod
-        std::cout << "Still need to implement prod" << std::endl;
+        printProducts();
     }else if(command == commands[2]){ //min
-        std::cout << "Still need to implement min" << std::endl;
+        printMin(input);
     }else if(command == commands[3]){ //max
         std::cout << "Still need to implement max" << std::endl;
     }else if(command == commands[4]){ //avg
@@ -68,7 +71,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[6]){ //time
         printCurrentTime();
     }else if(command == commands[7]){ //step
-        std::cout << "Still need to implement step"  << std::endl;
+        advanceTime();
     }else if(command == commands[8]){ //owncommand
         std::cout << "Still need to implement owncommand"  << std::endl;
     }else if(command == commands[9]){ //exit
@@ -83,6 +86,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
 //**********Execute user commands************
 
 //Called on help
+
 void AdvisorBot::printCommands(){
     std::cout << "Here are the available commands:" << std::endl;
     for(auto& command : commands){
@@ -92,6 +96,7 @@ void AdvisorBot::printCommands(){
 }
 
 //Called on help cmd
+
 void AdvisorBot::printCommands(std::vector<std::string>& input){
     if(input.size() != 2){
         std::cout << "The help command can only be alone or followed by a single command." << std::endl;
@@ -130,10 +135,42 @@ void AdvisorBot::printCommands(std::vector<std::string>& input){
 }
 
 //Called on prod
-//TODO implement this
+
+void AdvisorBot::printProducts(){
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    std::cout << "Here are the available products:" << std::endl;
+
+    for(std::string& product : products){
+        std::cout << product << std::endl;
+    }
+}
 
 //Called on min
-//TODO implement this
+
+void AdvisorBot::printMin(std::vector<std::string>& input){
+    if(input.size() > 3){
+        std::cout << "This is not the correct format for the 'min' command." << std::endl;
+        std::cout << "Please type 'help min' for an example of the correct format." << std::endl;
+        return;
+    }
+
+    std::string product = input[1];
+    OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
+
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    if(std::find(products.begin(),products.end(), product) == products.end()){
+        std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
+        return;
+    }
+    if(orderType == OrderBookType::unknown){
+        std::cout << "That is not a valid Order type. Valid types are 'ask' and 'bid'." << std::endl;
+        return;
+    }
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+    double min = orderBook.getLowPrice(entries);
+
+    std::cout << "The minimum " << OrderBookEntry::obtToString(orderType) << " for " << product << " is " << min << "." << std::endl;
+}
 
 //Called on max
 //TODO implement this
@@ -145,12 +182,23 @@ void AdvisorBot::printCommands(std::vector<std::string>& input){
 //TODO implement this
 
 //Called on time
+
 void AdvisorBot::printCurrentTime(){
-    std::cout << "TODO Implement this function, after implementing OrderBookEntry and OrderBook classes" << std::endl;
+    std::cout << "The current time in the simulation is: " << currentTime << std::endl;
 }
 
 //Called on step
-//TODO implement this
+
+void AdvisorBot::advanceTime(){
+    std::cout << "Advancing the simulation time..." <<std::endl;
+
+    //TODO, more logic will go here with other functions to save data for calculations
+    std::cout << "..." << std::endl;
+
+    currentTime = orderBook.getNextTime(currentTime);
+    printCurrentTime();
+    
+}
 
 //Called on owncommand
 //TODO implement this
