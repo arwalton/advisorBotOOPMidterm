@@ -5,6 +5,7 @@
 #include "OrderBook.h"
 #include <string>
 #include <vector>
+#include <map>
 
 
 	
@@ -40,6 +41,11 @@ class AdvisorBot
 		//Stores the OrderBook for the simulation
 		OrderBook orderBook{"20200601.csv"};
 
+		//Stores the average ask for each product seen.
+		std::map<std::string,std::vector<double>> askAverages;
+
+		//Stores the average bid for each product seen.
+		std::map<std::string,std::vector<double>> bidAverages;		
 
 		//Stores the command key words available to the user.
 		const std::vector<std::string> commands{
@@ -102,9 +108,21 @@ class AdvisorBot
 		void printProducts();
 
 		/**
-		 * @brief Prints the mi
+		 * @brief Prints the mininum value for a specific currency and OrderType
 		 * 
 		 */
 		void printMin(std::vector<std::string>& input);
+
+		/**
+		 * @brief Prints the maximum value for a specific currency and OrderType
+		 * 
+		 */
+		void printMax(std::vector<std::string>& input);
+
+		/**
+		 * @brief Adds all of the averages from the current time stamp to the averages map.
+		 * 
+		 */
+		void populateAverages();
 };
 #endif

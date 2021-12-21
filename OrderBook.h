@@ -10,6 +10,7 @@ class OrderBook
 {
 	private:
 		std::vector<OrderBookEntry> orders;
+		std::vector<std::string> products;
 
 	public:
 

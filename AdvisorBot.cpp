@@ -19,6 +19,7 @@ AdvisorBot::~AdvisorBot()
 void AdvisorBot::init(){
     std::vector<std::string> input;
     currentTime = orderBook.getEarliestTime();
+    populateAverages();
     
     while(running){
         input = getUserOption();
@@ -63,7 +64,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[2]){ //min
         printMin(input);
     }else if(command == commands[3]){ //max
-        std::cout << "Still need to implement max" << std::endl;
+        printMax(input);
     }else if(command == commands[4]){ //avg
         std::cout << "Still need to implement avg" << std::endl;
     }else if(command == commands[5]){ //predict
@@ -173,7 +174,31 @@ void AdvisorBot::printMin(std::vector<std::string>& input){
 }
 
 //Called on max
-//TODO implement this
+
+void AdvisorBot::printMax(std::vector<std::string>& input){
+    if(input.size() > 3){
+        std::cout << "This is not the correct format for the 'max' command." << std::endl;
+        std::cout << "Please type 'help max' for an example of the correct format." << std::endl;
+        return;
+    }
+
+    std::string product = input[1];
+    OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
+
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    if(std::find(products.begin(),products.end(), product) == products.end()){
+        std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
+        return;
+    }
+    if(orderType == OrderBookType::unknown){
+        std::cout << "That is not a valid Order type. Valid types are 'ask' and 'bid'." << std::endl;
+        return;
+    }
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+    double max = orderBook.getHighPrice(entries);
+
+    std::cout << "The maximum " << OrderBookEntry::obtToString(orderType) << " for " << product << " is " << max << "." << std::endl;
+}
 
 //Called on avg
 //TODO implement this
@@ -202,3 +227,10 @@ void AdvisorBot::advanceTime(){
 
 //Called on owncommand
 //TODO implement this
+
+
+//*********Helper functions**********
+
+void AdvisorBot::populateAverages(){
+    
+}
