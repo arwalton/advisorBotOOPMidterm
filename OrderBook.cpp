@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <map>
+#include <exception>
 	
 OrderBook::OrderBook(std::string filename)
 {
@@ -87,8 +88,22 @@ double OrderBook::getLowPrice(std::vector<OrderBookEntry>& orders){
     return min;
 }
 
-double OrderBook::getMeanPPU(std::vector<OrderBookEntry>& orders){
-    return 1.0;
+std::pair<double, double> OrderBook::getMeanPPU(std::vector<OrderBookEntry> orders){
+    double sumPrice = 0;
+    double numShares = 0;
+    std::pair<double,double> avgAndNum;
+    for(const OrderBookEntry& order : orders){
+        numShares = numShares + order.amount;
+        sumPrice = sumPrice + (order.amount * order.price);
+    }
+    //Check for divide by zero and throw exception if so.
+    if(numShares <= 0){
+        throw std::range_error("Attempt to divide by zero. Some currency has orders but unusable amounts.");
+    }
+    
+    avgAndNum.first = sumPrice / numShares;
+    avgAndNum.second = numShares;
+    return avgAndNum;
 }
 
 double OrderBook::getStDevPPU(std::vector<OrderBookEntry>& orders){

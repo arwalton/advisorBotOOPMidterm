@@ -66,7 +66,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[3]){ //max
         printMax(input);
     }else if(command == commands[4]){ //avg
-        std::cout << "Still need to implement avg" << std::endl;
+        printAverage(input);
     }else if(command == commands[5]){ //predict
         std::cout << "Still need to implement predict" << std::endl;
     }else if(command == commands[6]){ //time
@@ -118,7 +118,7 @@ void AdvisorBot::printCommands(std::vector<std::string>& input){
         "for that product in the current time step. Example: 'max ETH/BTC ask'" << std::endl;
     }else if(command == commands[4]){ //avg
         std::cout << "Type 'avg' followed by a product, either 'bid' or 'ask', and a number of timesteps to get" << std::endl <<
-        "the average ask or bid of that product over that timeframe. Example: avg ETH/BTC bid 10" << std::endl;
+        "the weighted average ask or bid of that product over that timeframe. Example: avg ETH/BTC bid 10" << std::endl;
     }else if(command == commands[5]){ //predict
         std::cout << "Type 'predict' followed by 'max' or 'min', a product, and either 'ask' or 'bid' to get a" << std::endl <<
         "prediction of that product for the next timestep. Example predict max ETH/BTC bid" << std::endl;
@@ -149,7 +149,7 @@ void AdvisorBot::printProducts(){
 //Called on min
 
 void AdvisorBot::printMin(std::vector<std::string>& input){
-    if(input.size() > 3){
+    if(input.size() != 3){
         std::cout << "This is not the correct format for the 'min' command." << std::endl;
         std::cout << "Please type 'help min' for an example of the correct format." << std::endl;
         return;
@@ -176,7 +176,7 @@ void AdvisorBot::printMin(std::vector<std::string>& input){
 //Called on max
 
 void AdvisorBot::printMax(std::vector<std::string>& input){
-    if(input.size() > 3){
+    if(input.size() != 3){
         std::cout << "This is not the correct format for the 'max' command." << std::endl;
         std::cout << "Please type 'help max' for an example of the correct format." << std::endl;
         return;
@@ -201,7 +201,40 @@ void AdvisorBot::printMax(std::vector<std::string>& input){
 }
 
 //Called on avg
-//TODO implement this
+
+void AdvisorBot::printAverage(std::vector<std::string>& input){
+    //Check for correct number of arguments
+    if(input.size() != 4){
+        std::cout << "This is not the correct format for the 'avg' command." << std::endl;
+        std::cout << "Please type 'help avg' for an example of the correct format." << std::endl;
+        return;
+    }
+
+    //Put product and orderType into variables
+    std::string product = input[1];
+    OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
+
+    //Check that product is formatted correctly and it exists
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    if(std::find(products.begin(),products.end(), product) == products.end()){
+        std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
+        return;
+    }
+    //Check orderType
+    if(orderType == OrderBookType::unknown){
+        std::cout << "That is not a valid Order type. Valid types are 'ask' and 'bid'." << std::endl;
+        return;
+    }
+
+    std::cout << "Still needs to be implemented fully, but this is the askAverages vector" << std::endl;
+    for(const auto& avg : askAverages){
+        std::cout << avg.first << std::endl;
+        
+        for(const auto& value : avg.second){
+            std::cout << value.first << " " << value.second << std::endl;
+        }
+    }
+}
 
 //Called on predict
 //TODO implement this
@@ -221,6 +254,7 @@ void AdvisorBot::advanceTime(){
     std::cout << "..." << std::endl;
 
     currentTime = orderBook.getNextTime(currentTime);
+    populateAverages();
     printCurrentTime();
     
 }
@@ -232,5 +266,27 @@ void AdvisorBot::advanceTime(){
 //*********Helper functions**********
 
 void AdvisorBot::populateAverages(){
-    
+    for(std::string currency : orderBook.getKnownProducts()){
+        try{
+            askAverages[currency].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Ask" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            askAverages[currency].push_back(std::pair<double,double>(0,0));
+        }
+
+        try{
+            bidAverages[currency].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Bid" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            bidAverages[currency].push_back(std::pair<double,double>(0,0));
+        }
+    }
 }

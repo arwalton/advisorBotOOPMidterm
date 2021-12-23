@@ -5,6 +5,7 @@
 #include "OrderBookEntry.h"
 #include <vector>
 #include <string>
+#include <utility>
 	
 class OrderBook  
 {
@@ -77,9 +78,9 @@ class OrderBook
 		 * @brief Get the price per unit of a vector of OrderbookEntry
 		 * 
 		 * @param orders a vector of OrderBookEntry - Should all be the same currency
-		 * @return double the mean price per unit
+		 * @return std::pair<double, double> The mean price per unit and the total number of units.
 		 */
-		static double getMeanPPU(std::vector<OrderBookEntry>& orders);
+		static std::pair<double, double> getMeanPPU(std::vector<OrderBookEntry> orders);
 
 		/**
 		 * @brief Get the standard deviation per unit of a vector of OrderBookEntry

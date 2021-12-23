@@ -5,6 +5,7 @@
 #include "OrderBook.h"
 #include <string>
 #include <vector>
+#include <utility>
 #include <map>
 
 
@@ -39,13 +40,15 @@ class AdvisorBot
 		std::string currentTime;
 
 		//Stores the OrderBook for the simulation
-		OrderBook orderBook{"20200601.csv"};
+		OrderBook orderBook{"small-test.csv"};
 
 		//Stores the average ask for each product seen.
-		std::map<std::string,std::vector<double>> askAverages;
+		//String is the product, first double is the avg, second double is the amount
+		std::map<std::string,std::vector<std::pair<double, double>>> askAverages;
 
 		//Stores the average bid for each product seen.
-		std::map<std::string,std::vector<double>> bidAverages;		
+		//String is the product, first double is the avg, second double is the amount
+		std::map<std::string,std::vector<std::pair<double,double>>> bidAverages;		
 
 		//Stores the command key words available to the user.
 		const std::vector<std::string> commands{
@@ -110,17 +113,26 @@ class AdvisorBot
 		/**
 		 * @brief Prints the mininum value for a specific currency and OrderType
 		 * 
+		 * @param input The tokenized string of user input
 		 */
 		void printMin(std::vector<std::string>& input);
 
 		/**
 		 * @brief Prints the maximum value for a specific currency and OrderType
 		 * 
+		 * @param input The tokenized string of user input
 		 */
 		void printMax(std::vector<std::string>& input);
 
 		/**
-		 * @brief Adds all of the averages from the current time stamp to the averages map.
+		 * @brief 
+		 * 
+		 * @param input The tokenized string of user input 
+		 */
+		void printAverage(std::vector<std::string>& input);
+
+		/**
+		 * @brief Adds all of the averages from the current time step to the averages map.
 		 * 
 		 */
 		void populateAverages();
