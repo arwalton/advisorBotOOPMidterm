@@ -130,11 +130,18 @@ class AdvisorBot
 		void printMax(std::vector<std::string>& input);
 
 		/**
-		 * @brief 
+		 * @brief Prints the average for a specific currency over the given timeframe.
 		 * 
 		 * @param input The tokenized string of user input 
 		 */
 		void printAverage(std::vector<std::string>& input);
+
+		/**
+		 * @brief Prints a prediction for the value of a specific currency in the next timestep.
+		 * 
+		 * @param input The tokenized string of user input 
+		 */
+		void printPrediction(std::vector<std::string>& input);
 
 		/**
 		 * @brief Adds all of the averages from the current time step to the averages map.

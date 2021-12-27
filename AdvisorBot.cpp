@@ -68,7 +68,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[4]){ //avg
         printAverage(input);
     }else if(command == commands[5]){ //predict
-        std::cout << "Still need to implement predict" << std::endl;
+        printPrediction(input);
     }else if(command == commands[6]){ //time
         printCurrentTime();
     }else if(command == commands[7]){ //step
@@ -239,14 +239,20 @@ void AdvisorBot::printAverage(std::vector<std::string>& input){
         return;
     }
 
-    //TODO implement the actual code.
     double average = calculateAverageTimeSteps(product,orderType,steps);
 
     std::cout << "The average " << product << " " << OrderBookEntry::obtToString(orderType) << " price per unit over the last " << std::to_string(steps) << " timesteps was " << std::to_string(average) << std::endl;
 }
 
 //Called on predict
-//TODO implement this
+
+void AdvisorBot::printPrediction(std::vector<std::string>& input){
+    //TODO implement this. You can use the average function if you don't have time.
+    //You can also use a function that compares currency values to one another and
+    //predicts values based on differences from the norm - Sort of like purchasing
+    //power parity.
+    std::cout << "Still need to implement predict" << std::endl;
+}
 
 //Called on time
 
