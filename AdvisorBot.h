@@ -42,6 +42,11 @@ class AdvisorBot
 		//Stores the OrderBook for the simulation
 		OrderBook orderBook{"small-test.csv"};
 
+		//Stored the averages for each product seen.
+		//The key pair is the product name and the OrderBookType.
+		//The value pair is the avg for the timestep and the amount of that product seen.
+		std::map<std::pair<std::string, OrderBookType>,std::vector<std::pair<double, double>>> averages;
+
 		//Stores the average ask for each product seen.
 		//String is the product, first double is the avg, second double is the amount
 		std::map<std::string,std::vector<std::pair<double, double>>> askAverages;
@@ -136,5 +141,14 @@ class AdvisorBot
 		 * 
 		 */
 		void populateAverages();
+
+		/**
+		 * @brief Calculates the average price per unit over the given set of timesteps
+		 * 
+		 * @param orderType 
+		 * @param steps The number of steps to use
+		 * @return double The average
+		 */
+		double calculateAverageTimeSteps(std::string product, OrderBookType orderType, int steps);
 };
 #endif

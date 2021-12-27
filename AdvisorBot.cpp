@@ -214,6 +214,16 @@ void AdvisorBot::printAverage(std::vector<std::string>& input){
     std::string product = input[1];
     OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
 
+    //Check that last number will convert to an integer
+    int steps = 0;
+    try{
+        steps = std::stoi(input[3]);
+    }catch(const std::invalid_argument& e){
+        std::cout << "The final argument must be a positive integer." << std::endl;
+        std::cout << "Please type 'help avg' for an example of the correct format." << std::endl;
+        return;
+    }
+
     //Check that product is formatted correctly and it exists
     std::vector<std::string> products = orderBook.getKnownProducts();
     if(std::find(products.begin(),products.end(), product) == products.end()){
@@ -226,14 +236,10 @@ void AdvisorBot::printAverage(std::vector<std::string>& input){
         return;
     }
 
-    std::cout << "Still needs to be implemented fully, but this is the askAverages vector" << std::endl;
-    for(const auto& avg : askAverages){
-        std::cout << avg.first << std::endl;
-        
-        for(const auto& value : avg.second){
-            std::cout << value.first << " " << value.second << std::endl;
-        }
-    }
+    //TODO implement the actual code.
+    double average = calculateAverageTimeSteps(product,orderType,steps);
+
+
 }
 
 //Called on predict
@@ -268,25 +274,47 @@ void AdvisorBot::advanceTime(){
 void AdvisorBot::populateAverages(){
     for(std::string currency : orderBook.getKnownProducts()){
         try{
-            askAverages[currency].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
+            averages[std::make_pair(currency, OrderBookType::ask)].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
         }catch(const std::range_error& e){
             std::cout << "An error occurred with the data." << std::endl;
             std::cout << "Currency: " << currency << std::endl;
             std::cout << "OrderType: Ask" << std::endl;
             std::cout << "Timestep: " << currentTime << std::endl;
             std::cout << "Error Message: " << e.what() << std::endl;
-            askAverages[currency].push_back(std::pair<double,double>(0,0));
+            averages[std::make_pair(currency, OrderBookType::ask)].push_back(std::pair<double,double>(0,0));
         }
 
         try{
-            bidAverages[currency].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
+            averages[std::make_pair(currency, OrderBookType::bid)].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
         }catch(const std::range_error& e){
             std::cout << "An error occurred with the data." << std::endl;
             std::cout << "Currency: " << currency << std::endl;
             std::cout << "OrderType: Bid" << std::endl;
             std::cout << "Timestep: " << currentTime << std::endl;
             std::cout << "Error Message: " << e.what() << std::endl;
-            bidAverages[currency].push_back(std::pair<double,double>(0,0));
+            averages[std::make_pair(currency, OrderBookType::bid)].push_back(std::pair<double,double>(0,0));
         }
     }
+}
+
+double AdvisorBot::calculateAverageTimeSteps(std::string product, OrderBookType orderType, int steps){
+    int i = 0;
+    for(auto it = averages.rbegin(); it != averages.rend(); ++it){
+        std::cout << "This is loop " << i << std::endl;
+        if(i >= steps){
+            break;
+        }
+        ++i;
+    }
+    
+    //TODO implement logic for this.
+    std::cout << "Still needs to be implemented fully, but this is the averages vector" << std::endl;
+    for(const auto& avg : averages){
+        std::cout << avg.first.first << " " << OrderBookEntry::obtToString(avg.first.second) << std::endl;
+        
+        for(const auto& value : avg.second){
+            std::cout << value.first << " " << value.second << std::endl;
+        }
+    }
+    return 0;
 }
