@@ -20,6 +20,8 @@ void AdvisorBot::init(){
     std::vector<std::string> input;
     currentTime = orderBook.getEarliestTime();
     populateAverages();
+    populateMaximums();
+    populateMinimums();
     
     while(running){
         input = getUserOption();
@@ -241,17 +243,74 @@ void AdvisorBot::printAverage(std::vector<std::string>& input){
 
     double average = calculateAverageTimeSteps(product,orderType,steps);
 
-    std::cout << "The average " << product << " " << OrderBookEntry::obtToString(orderType) << " price per unit over the last " << std::to_string(steps) << " timesteps was " << std::to_string(average) << std::endl;
+    std::cout << "The average " << product << " " << OrderBookEntry::obtToString(orderType) << " price per unit over the last " << std::to_string(steps) << " timestep(s) was " << std::to_string(average) << std::endl;
 }
 
 //Called on predict
 
 void AdvisorBot::printPrediction(std::vector<std::string>& input){
-    //TODO implement this. You can use the average function if you don't have time.
-    //You can also use a function that compares currency values to one another and
-    //predicts values based on differences from the norm - Sort of like purchasing
-    //power parity.
-    std::cout << "Still need to implement predict" << std::endl;
+    //Check for correct number of arguments
+    if(input.size() != 4){
+        std::cout << "This is not the correct format for the 'predict' command." << std::endl;
+        std::cout << "Please type 'help predict' for an example of the correct format." << std::endl;
+        return;
+    }
+
+    //Put product and orderType into variables
+    std::string product = input[2];
+    OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[3]);
+
+    //Check that product is formatted correctly and it exists
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    if(std::find(products.begin(),products.end(), product) == products.end()){
+        std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
+        return;
+    }
+
+    //Check orderType
+    if(orderType == OrderBookType::unknown){
+        std::cout << "That is not a valid Order type. Valid types are 'ask' and 'bid'." << std::endl;
+        return;
+    }
+
+    //Check for max or min
+    if(input[1] == "max"){
+        //Predict the max
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+
+        double currentHigh = orderBook.getHighPrice(entries);
+;
+        double prediction = 0;
+        if(maximums[std::make_pair(product,orderType)].size() == 1){
+            prediction = currentHigh;
+        }else{
+            prediction = calculateEMAMax(product,orderType,calculateSMAMax(product,orderType,5));
+        }
+        
+        std::cout << "Using an exponential moving average, my best prediction for the max " << OrderBookEntry::obtToString(orderType) << " for " << product << " is " << prediction << "." << std::endl;
+
+    }else if(input[1] == "min"){
+        //Predict the min
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+
+        double currentLow = orderBook.getLowPrice(entries);
+;
+        double prediction = 0;
+        if(minimums[std::make_pair(product,orderType)].size() == 1){
+            prediction = currentLow;
+        }else{
+            prediction = calculateEMAMin(product,orderType,calculateSMAMin(product,orderType,5));
+        }
+        
+        std::cout << "Using an exponential moving average, my best prediction for the min " << OrderBookEntry::obtToString(orderType) << " for " << product << " is " << prediction << "." << std::endl;
+
+
+    }else{
+        std::cout << "This is not the correct format for the 'predict' command." << std::endl;
+        std::cout << "There appears to be a problem with the third argument (max/min)." << std::endl;
+        std::cout << "Please type 'help predict' for an example of the correct format." << std::endl;
+        return;
+    }
 }
 
 //Called on time
@@ -270,6 +329,8 @@ void AdvisorBot::advanceTime(){
 
     currentTime = orderBook.getNextTime(currentTime);
     populateAverages();
+    populateMaximums();
+    populateMinimums();
     printCurrentTime();
     
 }
@@ -285,7 +346,7 @@ void AdvisorBot::populateAverages(){
         try{
             averages[std::make_pair(currency, OrderBookType::ask)].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
         }catch(const std::range_error& e){
-            std::cout << "An error occurred with the data." << std::endl;
+            std::cout << "An error occurred with the averages data." << std::endl;
             std::cout << "Currency: " << currency << std::endl;
             std::cout << "OrderType: Ask" << std::endl;
             std::cout << "Timestep: " << currentTime << std::endl;
@@ -296,7 +357,7 @@ void AdvisorBot::populateAverages(){
         try{
             averages[std::make_pair(currency, OrderBookType::bid)].push_back(OrderBook::getMeanPPU(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
         }catch(const std::range_error& e){
-            std::cout << "An error occurred with the data." << std::endl;
+            std::cout << "An error occurred with the averages data." << std::endl;
             std::cout << "Currency: " << currency << std::endl;
             std::cout << "OrderType: Bid" << std::endl;
             std::cout << "Timestep: " << currentTime << std::endl;
@@ -304,6 +365,130 @@ void AdvisorBot::populateAverages(){
             averages[std::make_pair(currency, OrderBookType::bid)].push_back(std::pair<double,double>(0,0));
         }
     }
+}
+
+void AdvisorBot::populateMaximums(){
+    for(std::string currency : orderBook.getKnownProducts()){
+        try{
+            maximums[std::make_pair(currency, OrderBookType::ask)].push_back(OrderBook::getHighPrice(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the maximums data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Ask" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            maximums[std::make_pair(currency, OrderBookType::ask)].push_back(0);
+        }
+
+        try{
+            maximums[std::make_pair(currency, OrderBookType::bid)].push_back(OrderBook::getHighPrice(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the maximums data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Bid" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            maximums[std::make_pair(currency, OrderBookType::bid)].push_back(0);
+        }
+    }
+}
+
+void AdvisorBot::populateMinimums(){
+    for(std::string currency : orderBook.getKnownProducts()){
+        try{
+            minimums[std::make_pair(currency, OrderBookType::ask)].push_back(OrderBook::getLowPrice(orderBook.getOrders(OrderBookType::ask,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the minimums data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Ask" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            minimums[std::make_pair(currency, OrderBookType::ask)].push_back(0);
+        }
+
+        try{
+            minimums[std::make_pair(currency, OrderBookType::bid)].push_back(OrderBook::getLowPrice(orderBook.getOrders(OrderBookType::bid,currency,currentTime)));
+        }catch(const std::range_error& e){
+            std::cout << "An error occurred with the minimums data." << std::endl;
+            std::cout << "Currency: " << currency << std::endl;
+            std::cout << "OrderType: Bid" << std::endl;
+            std::cout << "Timestep: " << currentTime << std::endl;
+            std::cout << "Error Message: " << e.what() << std::endl;
+            minimums[std::make_pair(currency, OrderBookType::bid)].push_back(0);
+        }
+    }
+}
+
+double AdvisorBot::calculateSMAMax(std::string product, OrderBookType orderType, int steps){
+    int step = 1;
+    int num = 0;
+    double sumMaximums = 0;
+    //Making the key for the maximums vector
+    std::pair<std::string,OrderBookType> key = std::make_pair(product, orderType);
+    
+    //Iterate through vector in reverse
+    for(auto it = maximums[key].rbegin(); it != maximums[key].rend(); ++it){
+        if(step > 1){
+            sumMaximums += *it;
+            ++num;
+        }
+        //Break if loop has run enough times.
+        if(step >= steps){
+            break;
+        }
+        ++step;
+    }
+    
+    return sumMaximums / num;
+}
+
+double AdvisorBot::calculateEMAMax(std::string product, OrderBookType orderType, double sma){
+    //The factor used in weighting the data - based on a five-day sma
+    double weightFactor = 2.0/6.0;
+    //Making the key for the maximums vector
+    std::pair<std::string,OrderBookType> key = std::make_pair(product, orderType);
+
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+
+    double currentMax = orderBook.getHighPrice(entries);
+
+    return (currentMax * weightFactor) + (sma * (1 - weightFactor));
+}
+
+double AdvisorBot::calculateSMAMin(std::string product, OrderBookType orderType, int steps){
+    int step = 1;
+    int num = 0;
+    double sumMinimums = 0;
+    //Making the key for the maximums vector
+    std::pair<std::string,OrderBookType> key = std::make_pair(product, orderType);
+    
+    //Iterate through vector in reverse
+    for(auto it = minimums[key].rbegin(); it != minimums[key].rend(); ++it){
+        if(step > 1){
+            sumMinimums += *it;
+            ++num;
+        }
+        //Break if loop has run enough times.
+        if(step >= steps){
+            break;
+        }
+        ++step;
+    }
+    
+    return sumMinimums / num;
+}
+
+double AdvisorBot::calculateEMAMin(std::string product, OrderBookType orderType, double sma){
+    //The factor used in weighting the data - based on a five-day sma
+    double weightFactor = 2.0/6.0;
+    //Making the key for the maximums vector
+    std::pair<std::string,OrderBookType> key = std::make_pair(product, orderType);
+
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+
+    double currentMin = orderBook.getLowPrice(entries);
+
+    return (currentMin * weightFactor) + (sma * (1 - weightFactor));
 }
 
 double AdvisorBot::calculateAverageTimeSteps(std::string product, OrderBookType orderType, int steps){
@@ -324,6 +509,5 @@ double AdvisorBot::calculateAverageTimeSteps(std::string product, OrderBookType 
         }
         ++step;
     }
-    
     return sumPrice / numShares;
 }

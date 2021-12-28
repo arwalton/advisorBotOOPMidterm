@@ -64,7 +64,7 @@ class OrderBook
 		 * @param orders a vector of OrderBookEntry - Should all be the same currency
 		 * @return double the highest price
 		 */
-		static double getHighPrice(std::vector<OrderBookEntry>& orders);
+		static double getHighPrice(std::vector<OrderBookEntry> orders);
 
 		/**
 		 * @brief Get the lowest price in a vector of orders
@@ -72,7 +72,7 @@ class OrderBook
 		 * @param orders a vector of OrderBookEntry - Should all be the same currency
 		 * @return double the lowest price
 		 */
-		static double getLowPrice(std::vector<OrderBookEntry>& orders);
+		static double getLowPrice(std::vector<OrderBookEntry> orders);
 
 		/**
 		 * @brief Get the price per unit of a vector of OrderbookEntry

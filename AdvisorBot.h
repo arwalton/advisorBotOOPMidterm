@@ -40,12 +40,27 @@ class AdvisorBot
 		std::string currentTime;
 
 		//Stores the OrderBook for the simulation
-		OrderBook orderBook{"small-test.csv"};
+		OrderBook orderBook{"20200601.csv"};
 
-		//Stored the averages for each product seen.
-		//The key pair is the product name and the OrderBookType.
-		//The value pair is the avg for the timestep and the amount of that product seen.
+
+		/**
+		 * @brief Stores the averages for each product seen.
+		 * The key pair is the product name and the OrderBookType.
+		 * The value pair is the avg for the timestep and the amount of that product seen.
+		 */
 		std::map<std::pair<std::string, OrderBookType>,std::vector<std::pair<double, double>>> averages;
+
+		/**
+		 * @brief Stores the maximums for each product seen.
+		 * The key pair is the product name and the OrderBookType.
+		 */
+		std::map<std::pair<std::string, OrderBookType>,std::vector<double>> maximums;
+
+		/**
+		 * @brief Stores the minimums for each product seen.
+		 * The key pair is the product name and the OrderBookType.
+		 */
+		std::map<std::pair<std::string, OrderBookType>,std::vector<double>> minimums;
 
 		//Stores the average ask for each product seen.
 		//String is the product, first double is the avg, second double is the amount
@@ -150,6 +165,18 @@ class AdvisorBot
 		void populateAverages();
 
 		/**
+		 * @brief Adds all of the maximums from the current time step to the maximums map.
+		 * 
+		 */
+		void populateMaximums();
+
+		/**
+		 * @brief Adds all of the minimums from the current time step to the minimums map.
+		 * 
+		 */
+		void populateMinimums();
+
+		/**
 		 * @brief Calculates the average price per unit over the given set of timesteps
 		 * 
 		 * @param orderType 
@@ -157,5 +184,47 @@ class AdvisorBot
 		 * @return double The average
 		 */
 		double calculateAverageTimeSteps(std::string product, OrderBookType orderType, int steps);
+
+		/**
+		 * @brief Calculates the simple moving average maximum value over the specified number of timesteps, 
+		 * not including currentTime
+		 * 
+		 * @param product The product string we are interested in.
+		 * @param orderType The OrderBookType we are interested in
+		 * @param steps The number of time steps to consider
+		 * @return double The average maximum value
+		 */
+		double calculateSMAMax(std::string product, OrderBookType orderType, int steps);
+
+		/**
+		 * @brief Calculates the simple moving average minimum value over the specified number of timesteps,
+		 * not including currentTime
+		 * 
+		 * @param product The product string we are interested in.
+		 * @param orderType The OrderBookType we are interested in
+		 * @param steps The number of time steps to consider
+		 * @return double The average minimum value
+		 */
+		double calculateSMAMin(std::string product, OrderBookType orderType, int steps);
+
+		/**
+		 * @brief Calculates the exponential moving average maximum value
+		 * 
+		 * @param product The product string 
+		 * @param orderType The OrderBookType
+		 * @param sma The simple moving average up to the previous timestep
+		 * @return double The exponential moving average maximum
+		 */
+		double calculateEMAMax(std::string product, OrderBookType orderType, double sma);
+
+		/**
+		 * @brief Calculates the exponential moving average minimum value
+		 * 
+		 * @param product The product string 
+		 * @param orderType The OrderBookType
+		 * @param sma The simple moving average up to the previous timestep
+		 * @return double The exponential moving average minimum
+		 */
+		double calculateEMAMin(std::string product, OrderBookType ordertype, double sma);
 };
 #endif
