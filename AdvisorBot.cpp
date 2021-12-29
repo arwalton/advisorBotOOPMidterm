@@ -75,8 +75,8 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
         printCurrentTime();
     }else if(command == commands[7]){ //step
         advanceTime();
-    }else if(command == commands[8]){ //owncommand
-        std::cout << "Still need to implement owncommand"  << std::endl;
+    }else if(command == commands[8]){ //stdev
+        std::cout << "Still need to implement stdev"  << std::endl;
     }else if(command == commands[9]){ //exit
         std::cout << "Thanks for playing. See you next time!"  << std::endl;
         running = false;
@@ -128,8 +128,9 @@ void AdvisorBot::printCommands(std::vector<std::string>& input){
         std::cout << "Type 'time' to get the current time in the dataset, i.e. which timeframe you are looking at." << std::endl;
     }else if(command == commands[7]){ //step
         std::cout << "Type 'step' to advance the simulation to the next step."  << std::endl;
-    }else if(command == commands[8]){ //owncommand
-        std::cout << "Type 'owncommand' to be blown away by my brilliance."  << std::endl;
+    }else if(command == commands[8]){ //stdev
+        std::cout << "Type 'stdev' followed by a product and either 'bid' or 'ask' to get the standard deviation" << std::endl <<
+        " of the product and ordertype in the current timestep."  << std::endl;
     }else if(command == commands[9]){ //exit
         std::cout << "Type 'exit' to end the simulation." << std::endl;
     }else{ //Bad input
@@ -335,8 +336,12 @@ void AdvisorBot::advanceTime(){
     
 }
 
-//Called on owncommand
+//Called on stdev
 //TODO implement this
+
+void AdvisorBot::printStDev(std::vector<std::string>& input){
+    
+}
 
 
 //*********Helper functions**********

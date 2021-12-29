@@ -80,7 +80,7 @@ class AdvisorBot
 			"predict",
 			"time",
 			"step",
-			"owncommand",
+			"stdev",
 			"exit"
 		};
 
@@ -158,6 +158,13 @@ class AdvisorBot
 		 */
 		void printPrediction(std::vector<std::string>& input);
 
+		/**
+		 * @brief Prints the standard deviation for the specified currency and ordertype
+		 * 
+		 * @param input The tokenized string of user input.
+		 */
+		void printStDev(std::vector<std::string>& input);
+		
 		/**
 		 * @brief Adds all of the averages from the current time step to the averages map.
 		 * 
