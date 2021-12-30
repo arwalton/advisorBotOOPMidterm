@@ -232,6 +232,8 @@ class AdvisorBot
 		 * @param sma The simple moving average up to the previous timestep
 		 * @return double The exponential moving average minimum
 		 */
-		double calculateEMAMin(std::string product, OrderBookType ordertype, double sma);
+		double calculateEMAMin(std::string product, OrderBookType orderType, double sma);
+
+		double calculateStDev(std::string product, OrderBookType orderType);
 };
 #endif

@@ -516,3 +516,15 @@ double AdvisorBot::calculateAverageTimeSteps(std::string product, OrderBookType 
     }
     return sumPrice / numShares;
 }
+
+double AdvisorBot::calculateStDev(std::string product, OrderBookType orderType){
+    double mean = averages[std::make_pair(product,orderType)].back().first;
+
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+
+    for(auto it = entries.begin(); it != entries.end(); ++it){
+
+    }
+
+    return 0;
+}
