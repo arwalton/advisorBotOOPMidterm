@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <cmath>
 
 	
 AdvisorBot::AdvisorBot()
@@ -76,7 +77,7 @@ void AdvisorBot::processUserOption(std::vector<std::string>& input){
     }else if(command == commands[7]){ //step
         advanceTime();
     }else if(command == commands[8]){ //stdev
-        std::cout << "Still need to implement stdev"  << std::endl;
+        printStDev(input);
     }else if(command == commands[9]){ //exit
         std::cout << "Thanks for playing. See you next time!"  << std::endl;
         running = false;
@@ -179,15 +180,18 @@ void AdvisorBot::printMin(std::vector<std::string>& input){
 //Called on max
 
 void AdvisorBot::printMax(std::vector<std::string>& input){
+    //Check input is the correct size
     if(input.size() != 3){
         std::cout << "This is not the correct format for the 'max' command." << std::endl;
         std::cout << "Please type 'help max' for an example of the correct format." << std::endl;
         return;
     }
 
+    //Add products and orderType to variables
     std::string product = input[1];
     OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
 
+    //Check that product and orderType are good input
     std::vector<std::string> products = orderBook.getKnownProducts();
     if(std::find(products.begin(),products.end(), product) == products.end()){
         std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
@@ -340,11 +344,36 @@ void AdvisorBot::advanceTime(){
 //TODO implement this
 
 void AdvisorBot::printStDev(std::vector<std::string>& input){
-    
+    //Check input is the correct size
+    if(input.size() != 3){
+        std::cout << "This is not the correct format for the 'max' command." << std::endl;
+        std::cout << "Please type 'help max' for an example of the correct format." << std::endl;
+        return;
+    }
+
+    //Add products and orderType to variables
+    std::string product = input[1];
+    OrderBookType orderType = OrderBookEntry::stringToOrderBookType(input[2]);
+
+    //Check that product and orderType are good input
+    std::vector<std::string> products = orderBook.getKnownProducts();
+    if(std::find(products.begin(),products.end(), product) == products.end()){
+        std::cout << "That product does not exist in this simulation. Please check the name and try again." << std::endl;
+        return;
+    }
+    if(orderType == OrderBookType::unknown){
+        std::cout << "That is not a valid Order type. Valid types are 'ask' and 'bid'." << std::endl;
+        return;
+    }
+
+    std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
+    double stDev = calculateStDev(product, orderType);
+
+    std::cout << "The standard deviation for " << product << " " << OrderBookEntry::obtToString(orderType) << "s is " << std::to_string(stDev) << std::endl;
 }
 
 
-//*********Helper functions**********
+//*********Additional functions**********
 
 void AdvisorBot::populateAverages(){
     for(std::string currency : orderBook.getKnownProducts()){
@@ -519,12 +548,21 @@ double AdvisorBot::calculateAverageTimeSteps(std::string product, OrderBookType 
 
 double AdvisorBot::calculateStDev(std::string product, OrderBookType orderType){
     double mean = averages[std::make_pair(product,orderType)].back().first;
+    double sumAmounts = averages[std::make_pair(product,orderType)].back().second;
 
     std::vector<OrderBookEntry> entries = orderBook.getOrders(orderType, product, currentTime);
 
-    for(auto it = entries.begin(); it != entries.end(); ++it){
+    double sumSquares = 0;
+    double square = 0;
 
+    for(auto entry : entries){
+        square = std::pow((entry.price - mean),2);
+
+
+        sumSquares += square * entry.amount;
     }
 
-    return 0;
+    double variance = sumSquares / sumAmounts;
+
+    return std::sqrt(variance);
 }
